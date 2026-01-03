@@ -6,7 +6,7 @@ pub struct Task {
     fut: Mutex<Option<BoxFuture<'static, ()>>>,
 }
 
-pub trait Task {
+pub trait TaskSender {
     fn post(&self, task: Task);
     fn post_future(&self, fut: impl Future<Output = ()>);
 }
