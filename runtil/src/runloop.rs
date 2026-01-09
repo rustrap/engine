@@ -3,7 +3,7 @@ use std::{
     thread::{self, ThreadId},
 };
 
-use crate::driver::EventPumpImpl;
+use crate::{driver::EventPumpImpl, runner::mainthread::MainThreadRunner};
 
 pub(crate) static MAIN_THREAD_ID: OnceLock<ThreadId> = OnceLock::new();
 
@@ -21,14 +21,13 @@ impl Context {
 
 pub trait UserMessage {}
 
+#[allow(async_fn_in_trait)]
 pub trait RunLoopHandler<M: UserMessage>
 where
     Self: Send + Sync,
 {
     fn init(&mut self, _cx: &mut Context) {}
-    /*fn handle_event(&mut self, _cx: &mut Context) -> impl Future<Output = ()> + Send {
-        async {}
-    }*/
+    async fn handle_event(&mut self, _cx: &mut Context) {}
     fn quit(&mut self, _cx: &mut Context) {}
 }
 
@@ -37,7 +36,7 @@ where
     M: UserMessage,
     H: RunLoopHandler<M>,
 {
-    // main_runner: MainThreadRunner,
+    main_runner: MainThreadRunner,
     // worker_runner: ParallelRunner,
     pump: EventPumpImpl,
     handler: H,
@@ -54,6 +53,7 @@ where
         let _ = MAIN_THREAD_ID.set(thread_id);
 
         RunLoop {
+            main_runner: MainThreadRunner::new(),
             pump: EventPumpImpl::new(),
             handler,
             phantom: std::marker::PhantomData,

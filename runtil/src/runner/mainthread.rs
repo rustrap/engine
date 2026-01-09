@@ -2,13 +2,13 @@ use crossbeam::queue::SegQueue;
 
 use crate::task::Task;
 
-pub struct UIThreadRunner {
+pub struct MainThreadRunner {
     tasks: SegQueue<Task>,
 }
 
-impl UIThreadRunner {
+impl MainThreadRunner {
     pub fn new() -> Self {
-        UIThreadRunner {
+        MainThreadRunner {
             tasks: SegQueue::new(),
         }
     }
