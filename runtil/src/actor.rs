@@ -52,6 +52,12 @@ impl<T> RtMainActor<T> {
 
 pub struct MainMarker(std::marker::PhantomData<std::sync::MutexGuard<'static, ()>>);
 
+impl MainMarker {
+    pub(crate) fn new() -> Self {
+        MainMarker(std::marker::PhantomData)
+    }
+}
+
 pub struct MainActor<T> {
     inner: Arc<RwLock<T>>,
 }

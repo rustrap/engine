@@ -3,7 +3,7 @@ use std::{
     thread::{self, ThreadId},
 };
 
-use crate::{driver::EventPumpImpl, runner::mainthread::MainThreadRunner};
+use crate::runner::mainthread::MainThreadRunner;
 
 pub(crate) static MAIN_THREAD_ID: OnceLock<ThreadId> = OnceLock::new();
 
@@ -38,7 +38,6 @@ where
 {
     main_runner: MainThreadRunner,
     // worker_runner: ParallelRunner,
-    pump: EventPumpImpl,
     handler: H,
     phantom: std::marker::PhantomData<M>,
 }
@@ -54,7 +53,6 @@ where
 
         RunLoop {
             main_runner: MainThreadRunner::new(),
-            pump: EventPumpImpl::new(),
             handler,
             phantom: std::marker::PhantomData,
         }
