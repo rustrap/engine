@@ -18,14 +18,14 @@ fn lock_result<T>(val: LockResult<T>) -> MainActorResult<T> {
 }
 
 /// Check thread id at runtime.
-pub struct MainActor<T> {
+pub struct RtMainActor<T> {
     inner: Arc<RwLock<T>>,
 }
 
-impl<T> MainActor<T> {
+impl<T> RtMainActor<T> {
     pub fn new(value: T) -> MainActorResult<Self> {
         Self::check_main()?;
-        Ok(MainActor {
+        Ok(RtMainActor {
             inner: Arc::new(value.into()),
         })
     }
@@ -50,7 +50,27 @@ impl<T> MainActor<T> {
     }
 }
 
-//TODO: MainMarker and MainActor with comptime check
+pub struct MainMarker(std::marker::PhantomData<std::sync::MutexGuard<'static, ()>>);
+
+pub struct MainActor<T> {
+    inner: Arc<RwLock<T>>,
+}
+
+impl<T> MainActor<T> {
+    pub fn new(_marker: MainMarker, value: T) -> MainActorResult<Self> {
+        Ok(MainActor {
+            inner: Arc::new(value.into()),
+        })
+    }
+
+    pub fn read(&self, _marker: MainMarker) -> MainActorResult<RwLockReadGuard<'_, T>> {
+        lock_result(self.inner.read())
+    }
+
+    pub fn write(&self, _marker: MainMarker) -> MainActorResult<RwLockWriteGuard<'_, T>> {
+        lock_result(self.inner.write())
+    }
+}
 
 #[cfg(test)]
 mod test {
@@ -64,9 +84,9 @@ mod test {
     struct Data();
 
     #[test]
-    fn main_actor() {
+    fn rt_main_actor() {
         let _runloop = RunLoop::new(Handler());
-        let a = MainActor::new(Data()).expect("it is not same as a thread that runloop born");
+        let a = RtMainActor::new(Data()).expect("it is not same as a thread that runloop born");
         let thread = std::thread::spawn(move || {
             assert_eq!(a.read().is_err(), true);
         });
