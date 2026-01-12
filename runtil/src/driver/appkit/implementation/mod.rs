@@ -53,4 +53,8 @@ impl AppkitEventPump {
 
         Ok(())
     }
+
+    pub fn run(&self) {
+        unsafe { runtilappkit_run() };
+    }
 }

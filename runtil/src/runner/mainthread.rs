@@ -15,7 +15,11 @@ impl MainThreadRunner {
         }
     }
 
-    pub(crate) fn schedule_task(&self, task: MainTask) {
+    pub fn schedule_task(&self, task: MainTask) {
         self.pump.set_task_and_schedule(task);
+    }
+
+    pub fn run(&self) {
+        self.pump.run();
     }
 }

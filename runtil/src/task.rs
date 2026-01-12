@@ -4,7 +4,6 @@ use futures::future::BoxFuture;
 
 use crate::actor::MainMarker;
 
-#[derive(Clone)]
 pub struct AsyncTask {
     fut: Mutex<Option<BoxFuture<'static, ()>>>,
 }
@@ -17,7 +16,6 @@ impl AsyncTask {
     }
 }
 
-#[derive(Clone)]
 pub struct MainTask {
     pub(crate) f: Box<dyn Fn(MainMarker) -> ()>,
 }

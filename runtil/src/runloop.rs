@@ -72,5 +72,6 @@ where
     pub fn run(&mut self) {
         let context = self.create_context();
         self.handler.init(&context);
+        self.main_runner.run();
     }
 }

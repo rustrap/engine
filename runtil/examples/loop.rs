@@ -6,7 +6,7 @@ struct Handler();
 impl RunLoopHandler<Message> for Handler {
     fn init(&mut self, cx: &Context) {
         cx.dispatch_main(|_marker| {
-            println!("hello world");
+            println!("hello, world!");
         });
     }
 }

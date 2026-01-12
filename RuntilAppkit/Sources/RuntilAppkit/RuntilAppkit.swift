@@ -24,7 +24,7 @@ func RuntilAppkitInit(ud: UnsafeMutableRawPointer, callback: @convention(c) (Uns
     source_cx.info = ud;
     source_cx.perform = callback;
     let source = CFRunLoopSourceCreate(nil, 1, &source_cx)!;
-    
+    CFRunLoopAddSource(loop, source, .commonModes)
     
     let app = NSApplication.shared;
     app.setActivationPolicy(.regular);
