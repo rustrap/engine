@@ -3,7 +3,9 @@ use std::{
     thread::{self, ThreadId},
 };
 
-use crate::{actor::MainMarker, runner::mainthread::MainThreadRunner, task::MainTask};
+use crate::{
+    actor::MainMarker, event::Event, runner::mainthread::MainThreadRunner, task::MainTask,
+};
 
 pub(crate) static MAIN_THREAD_ID: OnceLock<ThreadId> = OnceLock::new();
 
@@ -28,13 +30,13 @@ impl Context {
 
 pub trait UserMessage {}
 
-#[allow(async_fn_in_trait)]
 pub trait RunLoopHandler<M: UserMessage>
 where
     Self: Send + Sync,
 {
     fn init(&mut self, _cx: &Context) {}
-    async fn handle_event(&mut self, _cx: &mut Context) {}
+    fn handle_message(&mut self, _cx: &mut Context, _msg: M) {}
+    fn handle_event(&mut self, _cx: &mut Context, _e: Event) {}
     fn quit(&mut self, _cx: &Context) {}
 }
 
