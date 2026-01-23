@@ -53,8 +53,8 @@ func runtilAppkitRun() {
         assertionFailure("RuntilAppkitState is not initialized")
         return
     }
-    
-    RunLoop.current.run()
+    NSApp.activate(ignoringOtherApps: true)
+    NSApp.run()
 }
 
 @MainActor
@@ -63,3 +63,37 @@ func runtilAppkitDestroy() {
     RuntilAppkitState.shared.state = nil
 }
 
+@MainActor
+class RWindow {
+    var window: NSWindow;
+    
+    @MainActor
+    init() {
+        self.window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 480, height: 300),
+            styleMask: [.titled, .closable, .miniaturizable, .resizable],
+            backing: .buffered,
+            defer: false
+        );
+        self.window.makeKeyAndOrderFront(nil);
+    }
+    
+    @MainActor
+    deinit {
+        self.window.close();
+    }
+}
+
+@MainActor
+@_cdecl("runtilappkit_create_window")
+func runtilAppkitCreateWindow() -> UnsafeMutableRawPointer {
+    let wnd = RWindow();
+    let ptr = Unmanaged.passRetained(wnd).toOpaque();
+    return ptr;
+}
+
+@MainActor
+@_cdecl("runtilappkit_destroy_window")
+func runtilAppkitDestroyWindow(ptr: UnsafeMutableRawPointer) {
+    let _ = Unmanaged<RWindow>.fromOpaque(ptr).takeUnretainedValue();
+}

@@ -17,6 +17,7 @@ pub struct AppkitEventPump {
 }
 
 extern "C" fn callback(ct: *const c_void) {
+    unsafe { runtilappkit_create_window() };
     // SAFETY: ct is null checked
     let optask = unsafe { Arc::from_raw(ct as *const RwLock<Option<MainTask>>) };
     if let Ok(mut optask) = optask.write() {
