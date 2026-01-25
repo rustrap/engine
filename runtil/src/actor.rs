@@ -50,6 +50,7 @@ impl<T> RtMainActor<T> {
     }
 }
 
+#[derive(Clone, Copy)]
 pub struct MainMarker(std::marker::PhantomData<std::sync::MutexGuard<'static, ()>>);
 
 impl MainMarker {
@@ -63,10 +64,10 @@ pub struct MainActor<T> {
 }
 
 impl<T> MainActor<T> {
-    pub fn new(_marker: MainMarker, value: T) -> MainActorResult<Self> {
-        Ok(MainActor {
+    pub fn new(_marker: MainMarker, value: T) -> Self {
+        MainActor {
             inner: Arc::new(value.into()),
-        })
+        }
     }
 
     pub fn read(&self, _marker: MainMarker) -> MainActorResult<RwLockReadGuard<'_, T>> {

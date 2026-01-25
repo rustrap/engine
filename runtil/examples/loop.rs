@@ -5,13 +5,10 @@ impl UserMessage for Message {}
 struct Handler();
 impl RunLoopHandler<Message> for Handler {
     fn init(&mut self, cx: &Context) {
-        let window = cx.create_window();
-        window.show();
-        // TODO
-        // let wm = cx.window_manager();
-        // let window = wm.create(marker);
-        // window.show();
-        cx.dispatch_main(|_marker| {
+        let wm = cx.window_manager();
+        cx.dispatch_main(move |marker| {
+            let window = wm.create_window(marker);
+            window.read(marker).unwrap().show();
             println!("hello, world!");
         });
     }

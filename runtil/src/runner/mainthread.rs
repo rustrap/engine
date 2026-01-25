@@ -1,4 +1,7 @@
-use crate::{driver::EventPumpImpl, task::MainTask, window::Window};
+use crate::{
+    driver::{EventPumpImpl, WindowManagerImpl},
+    task::MainTask,
+};
 
 pub(crate) struct MainThreadRunner {
     pump: EventPumpImpl,
@@ -15,8 +18,8 @@ impl MainThreadRunner {
         self.pump.set_task_and_schedule(task);
     }
 
-    pub fn create_window(&self) -> Window {
-        self.pump.create_window()
+    pub fn create_window_manager_impl(&self) -> WindowManagerImpl {
+        self.pump.create_window_manager_impl()
     }
 
     pub fn run(&self) {

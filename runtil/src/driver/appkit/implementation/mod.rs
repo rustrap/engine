@@ -54,9 +54,8 @@ impl AppkitEventPump {
         Ok(())
     }
 
-    pub fn create_window(&self) -> Window {
-        let inner = AppkitWindowImpl::new();
-        Window::new(inner)
+    pub fn create_window_manager_impl(&self) -> AppkitWindowManager {
+        AppkitWindowManager::new()
     }
 
     pub fn run(&self) {
@@ -65,6 +64,19 @@ impl AppkitEventPump {
 
     pub fn quit(&self) {
         unsafe { runtilappkit_destroy() };
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct AppkitWindowManager {}
+
+impl AppkitWindowManager {
+    pub(crate) fn new() -> Self {
+        AppkitWindowManager {}
+    }
+
+    pub(crate) fn create_window_impl(&self) -> AppkitWindowImpl {
+        AppkitWindowImpl::new()
     }
 }
 

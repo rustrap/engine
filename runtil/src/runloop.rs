@@ -5,7 +5,7 @@ use std::{
 
 use crate::{
     actor::MainMarker, event::Event, runner::mainthread::MainThreadRunner, task::MainTask,
-    window::Window,
+    window::WindowManager,
 };
 
 pub(crate) static MAIN_THREAD_ID: OnceLock<ThreadId> = OnceLock::new();
@@ -28,8 +28,9 @@ impl Context {
         self.main_runner.schedule_task(task);
     }
 
-    pub fn create_window(&self) -> Window {
-        self.main_runner.create_window()
+    pub fn window_manager(&self) -> WindowManager {
+        let inner = self.main_runner.create_window_manager_impl();
+        WindowManager::new(inner)
     }
 }
 
