@@ -1,4 +1,5 @@
 use std::{
+    marker::PhantomData,
     sync::{Arc, OnceLock},
     thread::{self, ThreadId},
 };
@@ -10,16 +11,20 @@ use crate::{
 
 pub(crate) static MAIN_THREAD_ID: OnceLock<ThreadId> = OnceLock::new();
 
-pub struct Context {
+pub struct Context<M: UserMessage> {
     main_runner: Arc<MainThreadRunner>,
+    phantom: PhantomData<M>,
 }
 
-impl Context {
+impl<M: UserMessage> Context<M> {
     pub(crate) fn new(main_runner: Arc<MainThreadRunner>) -> Self {
-        Context { main_runner }
+        Context {
+            main_runner,
+            phantom: PhantomData,
+        }
     }
 
-    pub fn spawn(&self, _fut: impl Future<Output = ()>) {
+    pub fn post_random_task(&self, _fut: impl Future<Output = ()>, _send_after: Option<M>) {
         unimplemented!();
     }
 
@@ -40,10 +45,10 @@ pub trait RunLoopHandler<M: UserMessage>
 where
     Self: Send + Sync,
 {
-    fn init(&mut self, _cx: &Context) {}
-    fn handle_message(&mut self, _cx: &mut Context, _msg: M) {}
-    fn handle_event(&mut self, _cx: &mut Context, _e: Event) {}
-    fn quit(&mut self, _cx: &Context) {}
+    fn init(&mut self, _cx: &Context<M>) {}
+    fn handle_message(&mut self, _cx: &mut Context<M>, _msg: M) {}
+    fn handle_event(&mut self, _cx: &mut Context<M>, _e: Event) {}
+    fn quit(&mut self, _cx: &Context<M>) {}
 }
 
 pub struct RunLoop<M, H>
@@ -75,7 +80,7 @@ where
         }
     }
 
-    fn create_context(&self) -> Context {
+    fn create_context(&self) -> Context<M> {
         Context::new(self.main_runner.clone())
     }
 
